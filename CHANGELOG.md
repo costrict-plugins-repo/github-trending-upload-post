@@ -1,0 +1,74 @@
+# Changelog
+
+All notable changes to the Upload-Post plugin for Claude Code.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.4.0] — 2026-10-17
+
+### Added
+
+- `plugin.json` directory listing fields: `documentationUrl`, `privacyPolicyUrl`, `supportUrl`, `termsOfServiceUrl` and `icon`.
+- `homepage` points at the Claude landing page (`/claude-social-media/`), which covers Claude.ai and Cowork, where most installs come from.
+- README "Try it" section with example prompts.
+
+### Changed
+
+- Shorter plugin description that leads with what it does, for the directory card.
+- `setup` skill works on Claude.ai, the desktop app and Cowork as well as Claude Code (connect from Customize → Connectors), connects social accounts through `get_connect_link` instead of sending the user to the dashboard, and ends by offering a first post.
+- `setup` no longer suggests the local `npx` server with `UPLOAD_POST_API_KEY`; API-key setups stay documented in the README for CI and headless use.
+
+### Fixed
+
+- `autodm-architect` and the README no longer describe a public reply under the comment: AutoDM sends the DM only, with up to 3 link buttons.
+
+## [0.3.0] — 2026-10-02
+
+### Added
+
+- `.claude-plugin/marketplace.json`: the repo is now a self-hosted Claude Code marketplace (`/plugin marketplace add Upload-Post/upload-post-plugin`).
+- `gemini-extension.json` and `GEMINI.md`: install as a Gemini CLI extension with `gemini extensions install https://github.com/Upload-Post/upload-post-plugin`.
+
+### Fixed
+
+- Skills synced with the current MCP server tool parameters:
+  - `autodm-setup`: `manage_autodms` takes `profile_username`, `post_url`, `reply_message`, `buttons` (max 3), `monitoring_interval` (≥ 15 min), `trigger_keywords`, `monitor_id` and `include_inactive`. AutoDM sends the DM only; there is no public-reply field.
+  - `manage-comments`: comments now cover TikTok (`postId` = video id, needs the `comments` capability), X, Threads and Bluesky, plus reversible moderation with `comment_action`.
+  - `repurpose-video`: `submit_ffmpeg_job` takes `input_url` or `files`, a `full_command` starting with `ffmpeg` using `{input}`/`{output}` placeholders, and `output_filename`. FFmpeg quota is monthly minutes.
+  - `schedule-campaign`: Reddit publishing is currently unavailable (`reddit_unavailable`).
+- Every skill now declares a `name:` frontmatter field matching its folder.
+
+## [0.2.0] — 2026-07-28
+
+### Changed
+
+- **Authentication is now OAuth, not an API key.** `.mcp.json` points at the hosted server (`https://mcp.upload-post.com/mcp`) over OAuth 2.1 with dynamic client registration and PKCE, replacing the `npx @upload-post/mcp` stdio server behind `UPLOAD_POST_API_KEY`. Installing no longer requires exporting an environment variable before the plugin works — run `/mcp`, authenticate, done. API-key setups remain documented for CI and headless use.
+- Plugin description now reflects the platforms the MCP server actually exposes.
+- Documentation links moved from `upload-post.com/mcp-integration-guide` to `docs.upload-post.com`.
+
+### Added
+
+- `posting-queue` skill — configure recurring weekly slots, days and timezone, and preview what lands in the next slot.
+- `manage-comments` skill — read, triage, reply to and moderate comments across Instagram, Facebook, YouTube and LinkedIn, plus Google Business reviews.
+- Coverage for tools the plugin never surfaced: `retry_post`, `unpublish_post`, `get_history`, `get_media`, and the full queue and comment families.
+- `QUICK_START.md`, `FEATURES.md`, `EXAMPLES.md` and this changelog.
+
+### Fixed
+
+- Removed a reference to `select_google_business_location`, a tool that has never existed in the MCP server. Google Business posting takes the location id via `platformOptions.googleBusinessLocationId` after calling `get_google_business_locations`.
+- `post-debugger` pointed users at `connect-accounts`, a skill renamed to `whitelabel-connect` in 0.1.0. It now routes platform reconnects to the dashboard, and distinguishes a platform token expiring from the MCP session itself returning 401.
+- Documented that `get_queue_settings` requires `profile_username` despite the schema marking it optional — the API rejects the call without it.
+- Corrected the queue field names to `days_of_week` (0 = Monday) and `max_posts_per_slot`, and flagged that `update_queue_settings` replaces the configuration wholesale rather than merging.
+- Stopped suggesting `get_platform_metrics` to derive posting times; it takes no arguments and only lists available metric names.
+
+## [0.1.0] — 2026-05-20
+
+### Added
+
+- Initial release: MCP server wiring, six skills (`setup`, `whitelabel-connect`, `schedule-campaign`, `repurpose-video`, `autodm-setup`, `analyze-performance`) and three agents (`content-strategist`, `autodm-architect`, `post-debugger`).
+
+[0.3.0]: https://github.com/Upload-Post/upload-post-plugin/releases/tag/v0.3.0
+[0.2.0]: https://github.com/Upload-Post/upload-post-plugin/releases/tag/v0.2.0
+[0.1.0]: https://github.com/Upload-Post/upload-post-plugin/releases/tag/v0.1.0
